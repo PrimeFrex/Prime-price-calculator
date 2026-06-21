@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prime Price Calculator</title>
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+body{
+    background:#0f172a;
+    color:white;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    padding:20px;
+}
+.container{
+    max-width:700px;
+    margin:auto;
+}
+.header{
+    text-align:center;
+    margin-bottom:20px;
+}
+.header h1{
+    font-size:32px;
+}
+.card{
+    background:#1e293b;
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:18px;
+}
+label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:600;
+}
+input[type=number]{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:12px;
+    font-size:22px;
+}
+.radio-group{
+    margin-top:15px;
+}
+.radio-group label{
+    margin-bottom:12px;
+}
+.cost{
+    text-align:center;
+    font-size:42px;
+    color:#22c55e;
+    font-weight:bold;
+}
+.buttons{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+.btn{
+    background:#334155;
+    color:white;
+    border:none;
+    border-radius:12px;
+    padding:15px;
+    font-size:20px;
+    font-weight:bold;
+    cursor:pointer;
+}
+.btn:hover{
+    background:#475569;
+}
+.result{
+    text-align:center;
+}
+.result-price{
+    font-size:54px;
+    color:#22c55e;
+    font-weight:bold;
+}
+.result-gp{
+    color:#cbd5e1;
+    margin-top:10px;
+}
+.action-btn{
+    width:100%;
+    margin-top:12px;
+    background:#16a34a;
+    color:white;
+    border:none;
+    border-radius:12px;
+    padding:15px;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+}
+.reset-btn{
+    background:#dc2626;
+}
+.small{
+    text-align:center;
+    color:#94a3b8;
+    margin-top:10px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>Prime Price Calculator</h1>
+</div>
+<div class="card">
+<label>SAP Price</label>
+<input type="number" step="0.0001" id="sapPrice" placeholder="6.4950">
+<div class="radio-group">
+<label>
+<input type="radio" name="source" value="17" checked>
+Computer (17% GP)
+</label>
+<label>
+<input type="radio" name="source" value="10">
+iPad (10% GP)
+</label>
+</div>
+<button class="action-btn" onclick="calculateCost()">
+Calculate Cost
+</button>
+</div>
+<div class="card">
+<div class="small">Estimated Cost</div>
+<div class="cost" id="costDisplay">$0.0000</div>
+</div>
+<div class="card">
+<div class="buttons">
+<button class="btn" onclick="calculateTarget(1)">1%</button>
+<button class="btn" onclick="calculateTarget(2)">2%</button>
+<button class="btn" onclick="calculateTarget(5)">5%</button>
+<button class="btn" onclick="calculateTarget(7)">7%</button>
+<button class="btn" onclick="calculateTarget(8)">8%</button>
+<button class="btn" onclick="calculateTarget(12)">12%</button>
+<button class="btn" onclick="calculateTarget(15)">15%</button>
+</div>
+<br>
+<label>Custom GP %</label>
+<input type="number" id="customGP" placeholder="Enter GP %">
+<button class="action-btn" onclick="calculateCustom()">
+Calculate Custom GP
+</button>
+</div>
+<div class="card result">
+<div class="result-price" id="resultPrice">
+$0.0000
+</div>
+<div class="result-gp" id="resultGP">
+Select a GP %
+</div>
+<button class="action-btn" onclick="copyResult()">
+Copy Price
+</button>
+<button class="action-btn reset-btn" onclick="resetApp()">
+Reset
+</button>
+</div>
+</div>
+<script>
+let currentCost = 0;
+let currentResult = "";
+function calculateCost(){
+    let price =
+        parseFloat(document.getElementById("sapPrice").value);
+    if(isNaN(price)){
+        alert("Please enter a SAP price.");
+        return;
+    }
+    let source =
+        parseFloat(
+            document.querySelector(
+                'input[name="source"]:checked'
+            ).value
+        );
+    currentCost =
+        price * (1 - source/100);
+    document.getElementById("costDisplay").innerText =
+        "$" + currentCost.toFixed(4);
+}
+function calculateTarget(gp){
+    if(currentCost === 0){
+        calculateCost();
+    }
+    if(currentCost === 0){
+        return;
+    }
+    let targetPrice =
+        currentCost / (1 - gp/100);
+    currentResult =
+        targetPrice.toFixed(4);
+    document.getElementById("resultPrice").innerText =
+        "$" + currentResult;
+    document.getElementById("resultGP").innerText =
+        "Target GP: " + gp + "%";
+}
+function calculateCustom(){
+    let gp =
+        parseFloat(
+            document.getElementById("customGP").value
+        );
+    if(isNaN(gp)){
+        alert("Enter a GP percentage.");
+        return;
+    }
+    calculateTarget(gp);
+}
+function copyResult(){
+    if(currentResult === ""){
+        return;
+    }
+    navigator.clipboard.writeText(currentResult);
+    alert("Copied: " + currentResult);
+}
+function resetApp(){
+    document.getElementById("sapPrice").value = "";
+    document.getElementById("customGP").value = "";
+    currentCost = 0;
+    currentResult = "";
+    document.getElementById("costDisplay").innerText =
+        "$0.0000";
+    document.getElementById("resultPrice").innerText =
+        "$0.0000";
+    document.getElementById("resultGP").innerText =
+        "Select a GP %";
+}
+</script>
+</body>
+</html>
