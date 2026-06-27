@@ -1,239 +1,613 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prime Price Calculator</title>
-<style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
-body{
-    background:#0f172a;
-    color:white;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    padding:20px;
-}
-.container{
-    max-width:700px;
-    margin:auto;
-}
-.header{
-    text-align:center;
-    margin-bottom:20px;
-}
-.header h1{
-    font-size:32px;
-}
-.card{
-    background:#1e293b;
-    border-radius:18px;
-    padding:20px;
-    margin-bottom:18px;
-}
-label{
-    display:block;
-    margin-bottom:8px;
-    font-weight:600;
-}
-input[type=number]{
-    width:100%;
-    padding:15px;
-    border:none;
-    border-radius:12px;
-    font-size:22px;
-}
-.radio-group{
-    margin-top:15px;
-}
-.radio-group label{
-    margin-bottom:12px;
-}
-.cost{
-    text-align:center;
-    font-size:42px;
-    color:#22c55e;
-    font-weight:bold;
-}
-.buttons{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:10px;
-}
-.btn{
-    background:#334155;
-    color:white;
-    border:none;
-    border-radius:12px;
-    padding:15px;
-    font-size:20px;
-    font-weight:bold;
-    cursor:pointer;
-}
-.btn:hover{
-    background:#475569;
-}
-.result{
-    text-align:center;
-}
-.result-price{
-    font-size:54px;
-    color:#22c55e;
-    font-weight:bold;
-}
-.result-gp{
-    color:#cbd5e1;
-    margin-top:10px;
-}
-.action-btn{
-    width:100%;
-    margin-top:12px;
-    background:#16a34a;
-    color:white;
-    border:none;
-    border-radius:12px;
-    padding:15px;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
-}
-.reset-btn{
-    background:#dc2626;
-}
-.small{
-    text-align:center;
-    color:#94a3b8;
-    margin-top:10px;
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="F. McNeely" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>Calculadora de precios de F. McNeely</title>
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#151f32;
+      --card2:#1b2940;
+      --text:#f8fafc;
+      --muted:#94a3b8;
+      --line:rgba(255,255,255,.09);
+      --green:#22c55e;
+      --yellow:#facc15;
+      --orange:#fb923c;
+      --red:#ef4444;
+      --blue:#38bdf8;
+      --btn:#26364f;
+      --btnActive:#16a34a;
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      background:
+        radial-gradient(circle at top left, rgba(56,189,248,.16), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(34,197,94,.12), transparent 35%),
+        var(--bg);
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Arial,sans-serif;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    body{
+      padding:env(safe-area-inset-top) 10px env(safe-area-inset-bottom);
+    }
+
+    .app{
+      width:min(100%, 980px);
+      margin:0 auto;
+      padding:10px 0;
+    }
+
+    .title{
+      text-align:center;
+      margin:2px 0 8px;
+    }
+
+    .title h1{
+      margin:0;
+      font-size:clamp(20px, 5vw, 34px);
+      line-height:1.05;
+      letter-spacing:-.02em;
+    }
+
+    .title p{
+      margin:5px 0 0;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:8px;
+    }
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018)), var(--card);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:12px;
+      box-shadow:0 14px 34px rgba(0,0,0,.22);
+    }
+
+    .label{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      margin-bottom:6px;
+    }
+
+    input{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#0f172a;
+      color:var(--text);
+      padding:10px 12px;
+      font-size:22px;
+      font-weight:750;
+      outline:none;
+      text-align:center;
+      min-height:48px;
+    }
+
+    input:focus{
+      border-color:rgba(56,189,248,.65);
+      box-shadow:0 0 0 4px rgba(56,189,248,.12);
+    }
+
+    .sources{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-top:8px;
+    }
+
+    .source{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      border:1px solid var(--line);
+      background:var(--btn);
+      border-radius:14px;
+      padding:10px 6px;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+      min-height:44px;
+      user-select:none;
+    }
+
+    .source input{display:none}
+
+    .source:has(input:checked){
+      background:rgba(22,163,74,.18);
+      border-color:rgba(34,197,94,.7);
+      color:#dcfce7;
+    }
+
+    .source span:last-child{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .miniGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+
+    .metric{
+      background:rgba(15,23,42,.68);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:10px;
+      text-align:center;
+    }
+
+    .metric .name{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+      margin-bottom:2px;
+    }
+
+    .metric .value{
+      font-size:clamp(23px, 6.2vw, 38px);
+      font-weight:900;
+      letter-spacing:-.03em;
+      color:var(--green);
+    }
+
+    .gpGrid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:7px;
+    }
+
+    button{
+      border:0;
+      border-radius:14px;
+      color:var(--text);
+      background:var(--btn);
+      padding:10px 6px;
+      font-size:16px;
+      font-weight:900;
+      min-height:46px;
+      cursor:pointer;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    button:active{transform:scale(.98)}
+
+    button.active{
+      background:linear-gradient(180deg, #22c55e, #15803d);
+      color:white;
+    }
+
+    .customRow{
+      display:grid;
+      grid-template-columns:1fr 86px;
+      gap:8px;
+      margin-top:8px;
+    }
+
+    .customRow input{
+      font-size:18px;
+      min-height:46px;
+    }
+
+    .resultCard{
+      text-align:center;
+      padding:12px 10px;
+    }
+
+    .resultLabel{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+    }
+
+    .result{
+      font-size:clamp(42px, 14vw, 82px);
+      font-weight:950;
+      line-height:1;
+      margin-top:5px;
+      letter-spacing:-.06em;
+      color:var(--green);
+      text-shadow:0 0 24px rgba(34,197,94,.16);
+    }
+
+    .resultSub{
+      color:var(--muted);
+      font-size:13px;
+      margin-top:5px;
+      min-height:16px;
+    }
+
+    .competitor{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:8px;
+    }
+
+    .compStats{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:7px;
+    }
+
+    .stat{
+      background:rgba(15,23,42,.68);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:9px 5px;
+      text-align:center;
+      min-height:67px;
+    }
+
+    .stat .name{
+      color:var(--muted);
+      font-size:11px;
+      font-weight:800;
+      margin-bottom:4px;
+    }
+
+    .stat .val{
+      font-size:clamp(16px, 4.2vw, 28px);
+      font-weight:950;
+      letter-spacing:-.03em;
+    }
+
+    .status{
+      text-align:center;
+      font-size:13px;
+      font-weight:900;
+      padding:8px;
+      border-radius:13px;
+      background:rgba(148,163,184,.12);
+      border:1px solid var(--line);
+    }
+
+    .reset{
+      width:100%;
+      background:rgba(239,68,68,.15);
+      border:1px solid rgba(239,68,68,.35);
+      color:#fecaca;
+      min-height:42px;
+      margin-top:8px;
+      font-size:15px;
+    }
+
+    .hint{
+      color:var(--muted);
+      font-size:11px;
+      text-align:center;
+      margin-top:5px;
+    }
+
+    .green{color:var(--green)!important}
+    .yellow{color:var(--yellow)!important}
+    .orange{color:var(--orange)!important}
+    .red{color:var(--red)!important}
+    .blue{color:var(--blue)!important}
+
+    @media (min-width: 760px){
+      .app{padding:18px}
+      .layout{
+        grid-template-columns:1fr 1fr;
+        align-items:start;
+      }
+      .wide{grid-column:span 2}
+      .title{margin-bottom:16px}
+      .card{padding:16px}
+      .result{font-size:76px}
+    }
+
+    @media (max-height: 720px) and (max-width: 520px){
+      body{padding:5px 8px}
+      .title h1{font-size:19px}
+      .title p{display:none}
+      .card{padding:9px;border-radius:15px;margin:0}
+      .layout{gap:6px}
+      input{min-height:41px;font-size:19px;padding:7px 9px}
+      .source{min-height:38px;padding:7px 5px;font-size:12px}
+      button{min-height:38px;padding:7px 4px;font-size:14px;border-radius:12px}
+      .result{font-size:42px}
+      .metric .value{font-size:24px}
+      .stat{min-height:58px;padding:7px 4px}
+      .stat .val{font-size:16px}
+      .reset{min-height:36px;margin-top:6px}
+    }
+  </style>
 </head>
+
 <body>
-<div class="container">
-<div class="header">
-<h1>Prime Price Calculator</h1>
-</div>
-<div class="card">
-<label>SAP Price</label>
-<input type="number" step="0.0001" id="sapPrice" placeholder="6.4950">
-<div class="radio-group">
-<label>
-<input type="radio" name="source" value="17" checked>
-Computer (17% GP)
-</label>
-<label>
-<input type="radio" name="source" value="10">
-iPad (10% GP)
-</label>
-</div>
-<button class="action-btn" onclick="calculateCost()">
-Calculate Cost
-</button>
-</div>
-<div class="card">
-<div class="small">Estimated Cost</div>
-<div class="cost" id="costDisplay">$0.0000</div>
-</div>
-<div class="card">
-<div class="buttons">
-<button class="btn" onclick="calculateTarget(1)">1%</button>
-<button class="btn" onclick="calculateTarget(2)">2%</button>
-<button class="btn" onclick="calculateTarget(5)">5%</button>
-<button class="btn" onclick="calculateTarget(7)">7%</button>
-<button class="btn" onclick="calculateTarget(8)">8%</button>
-<button class="btn" onclick="calculateTarget(12)">12%</button>
-<button class="btn" onclick="calculateTarget(15)">15%</button>
-</div>
-<br>
-<label>Custom GP %</label>
-<input type="number" id="customGP" placeholder="Enter GP %">
-<button class="action-btn" onclick="calculateCustom()">
-Calculate Custom GP
-</button>
-</div>
-<div class="card result">
-<div class="result-price" id="resultPrice">
-$0.0000
-</div>
-<div class="result-gp" id="resultGP">
-Select a GP %
-</div>
-<button class="action-btn" onclick="copyResult()">
-Copy Price
-</button>
-<button class="action-btn reset-btn" onclick="resetApp()">
-Reset
-</button>
-</div>
-</div>
-<script>
-let currentCost = 0;
-let currentResult = "";
-function calculateCost(){
-    let price =
-        parseFloat(document.getElementById("sapPrice").value);
-    if(isNaN(price)){
-        alert("Please enter a SAP price.");
-        return;
+  <main class="app">
+    <header class="title">
+      <h1>Calculadora de precios de F. McNeely</h1>
+      <p>Herramienta rápida de cotización y análisis de competencia</p>
+    </header>
+
+    <section class="layout">
+
+      <div class="card">
+        <div class="label">Precio SAP</div>
+        <input id="sapPrice" type="number" inputmode="decimal" step="0.0001" placeholder="6.4950" autocomplete="off" />
+
+        <div class="sources">
+          <label class="source">
+            <input type="radio" name="sourceGP" value="17" checked>
+            <div>Computadora<br><span>17% GP</span></div>
+          </label>
+
+          <label class="source">
+            <input type="radio" name="sourceGP" value="10">
+            <div>iPad<br><span>10% GP</span></div>
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="miniGrid">
+          <div class="metric">
+            <div class="name">Costo estimado</div>
+            <div id="costDisplay" class="value">$0.0000</div>
+          </div>
+          <div class="metric">
+            <div class="name">Margen elegido</div>
+            <div id="selectedGP" class="value blue">--%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="label">Margen deseado</div>
+        <div class="gpGrid">
+          <button class="gpBtn" data-gp="1">1%</button>
+          <button class="gpBtn" data-gp="2">2%</button>
+          <button class="gpBtn" data-gp="5">5%</button>
+          <button class="gpBtn" data-gp="7">7%</button>
+          <button class="gpBtn" data-gp="8">8%</button>
+          <button class="gpBtn" data-gp="12">12%</button>
+          <button class="gpBtn" data-gp="15">15%</button>
+          <button id="customButton">Otro</button>
+        </div>
+
+        <div class="customRow">
+          <input id="customGP" type="number" inputmode="decimal" step="0.01" placeholder="Otro %" autocomplete="off" />
+          <button id="applyCustom">Aplicar</button>
+        </div>
+        <div class="hint">Escribe un margen y toca “Aplicar” o “Otro”.</div>
+      </div>
+
+      <div class="card resultCard">
+        <div class="resultLabel">Precio de venta</div>
+        <div id="salePrice" class="result">$0.0000</div>
+        <div id="saleSub" class="resultSub">Ingresa precio SAP y elige margen</div>
+      </div>
+
+      <div class="card wide">
+        <div class="competitor">
+          <div>
+            <div class="label">Análisis de competencia</div>
+            <input id="competitorPrice" type="number" inputmode="decimal" step="0.0001" placeholder="Precio del competidor" autocomplete="off" />
+          </div>
+
+          <div class="compStats">
+            <div class="stat">
+              <div class="name">Margen</div>
+              <div id="compMargin" class="val">0.00%</div>
+            </div>
+            <div class="stat">
+              <div class="name">Ganancia</div>
+              <div id="compProfit" class="val">$0.0000</div>
+            </div>
+            <div class="stat">
+              <div class="name">Diferencia</div>
+              <div id="compDiff" class="val">$0.0000</div>
+            </div>
+          </div>
+
+          <div id="compStatus" class="status">Ingresa precio del competidor</div>
+          <button class="reset" id="clearButton">Limpiar todo</button>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <script>
+    const sapPrice = document.getElementById("sapPrice");
+    const customGP = document.getElementById("customGP");
+    const competitorPrice = document.getElementById("competitorPrice");
+    const costDisplay = document.getElementById("costDisplay");
+    const selectedGP = document.getElementById("selectedGP");
+    const salePrice = document.getElementById("salePrice");
+    const saleSub = document.getElementById("saleSub");
+    const compMargin = document.getElementById("compMargin");
+    const compProfit = document.getElementById("compProfit");
+    const compDiff = document.getElementById("compDiff");
+    const compStatus = document.getElementById("compStatus");
+
+    let currentCost = 0;
+    let currentSalePrice = 0;
+    let currentGP = null;
+
+    function money(value){
+      if (!isFinite(value)) return "$0.0000";
+      return "$" + value.toFixed(4);
     }
-    let source =
-        parseFloat(
-            document.querySelector(
-                'input[name="source"]:checked'
-            ).value
-        );
-    currentCost =
-        price * (1 - source/100);
-    document.getElementById("costDisplay").innerText =
-        "$" + currentCost.toFixed(4);
-}
-function calculateTarget(gp){
-    if(currentCost === 0){
+
+    function pct(value){
+      if (!isFinite(value)) return "0.00%";
+      return value.toFixed(2) + "%";
+    }
+
+    function getSourceGP(){
+      return Number(document.querySelector("input[name='sourceGP']:checked").value);
+    }
+
+    function calculateCost(){
+      const price = Number(sapPrice.value);
+      if (!price || price <= 0){
+        currentCost = 0;
+        costDisplay.textContent = "$0.0000";
+        return false;
+      }
+
+      const sourceGP = getSourceGP();
+      currentCost = price * (1 - sourceGP / 100);
+      costDisplay.textContent = money(currentCost);
+      return true;
+    }
+
+    function clearActiveButtons(){
+      document.querySelectorAll(".gpBtn, #customButton").forEach(btn => btn.classList.remove("active"));
+    }
+
+    function setSalePrice(gp, btn = null){
+      if (!calculateCost()) return;
+
+      if (!isFinite(gp) || gp < 0 || gp >= 100) return;
+
+      currentGP = gp;
+      currentSalePrice = currentCost / (1 - gp / 100);
+
+      salePrice.textContent = money(currentSalePrice);
+      selectedGP.textContent = gp.toFixed(gp % 1 === 0 ? 0 : 2) + "%";
+      saleSub.textContent = "Precio calculado con " + selectedGP.textContent + " de margen bruto";
+
+      clearActiveButtons();
+      if (btn) btn.classList.add("active");
+
+      updateCompetitor();
+    }
+
+    function setColorByMargin(element, margin){
+      element.classList.remove("green","yellow","orange","red");
+      if (!isFinite(margin)) return;
+      if (margin >= 12) element.classList.add("green");
+      else if (margin >= 7) element.classList.add("yellow");
+      else if (margin >= 3) element.classList.add("orange");
+      else element.classList.add("red");
+    }
+
+    function updateCompetitor(){
+      calculateCost();
+
+      const comp = Number(competitorPrice.value);
+
+      if (!currentCost || !comp || comp <= 0){
+        compMargin.textContent = "0.00%";
+        compProfit.textContent = "$0.0000";
+        compDiff.textContent = "$0.0000";
+        compStatus.textContent = "Ingresa precio del competidor";
+        compMargin.className = "val";
+        compProfit.className = "val";
+        compDiff.className = "val";
+        return;
+      }
+
+      const margin = ((comp - currentCost) / comp) * 100;
+      const profit = comp - currentCost;
+      const diff = currentSalePrice ? comp - currentSalePrice : 0;
+
+      compMargin.textContent = pct(margin);
+      compProfit.textContent = money(profit);
+      compDiff.textContent = (diff >= 0 ? "+" : "-") + money(Math.abs(diff));
+
+      compMargin.className = "val";
+      compProfit.className = "val";
+      compDiff.className = "val";
+      setColorByMargin(compMargin, margin);
+      compProfit.classList.add(profit >= 0 ? "green" : "red");
+      compDiff.classList.add(diff >= 0 ? "green" : "red");
+
+      if (margin >= 12) {
+        compStatus.textContent = "🟢 Excelente margen";
+      } else if (margin >= 7) {
+        compStatus.textContent = "🟡 Margen aceptable";
+      } else if (margin >= 3) {
+        compStatus.textContent = "🟠 Margen bajo";
+      } else {
+        compStatus.textContent = "🔴 Margen muy bajo";
+      }
+    }
+
+    document.querySelectorAll(".gpBtn").forEach(btn => {
+      btn.addEventListener("click", () => setSalePrice(Number(btn.dataset.gp), btn));
+    });
+
+    document.getElementById("customButton").addEventListener("click", () => {
+      const gp = Number(customGP.value);
+      setSalePrice(gp, document.getElementById("customButton"));
+    });
+
+    document.getElementById("applyCustom").addEventListener("click", () => {
+      const gp = Number(customGP.value);
+      setSalePrice(gp, document.getElementById("customButton"));
+    });
+
+    customGP.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        const gp = Number(customGP.value);
+        setSalePrice(gp, document.getElementById("customButton"));
+        customGP.blur();
+      }
+    });
+
+    sapPrice.addEventListener("input", () => {
+      calculateCost();
+      if (currentGP !== null) setSalePrice(currentGP);
+      updateCompetitor();
+    });
+
+    document.querySelectorAll("input[name='sourceGP']").forEach(radio => {
+      radio.addEventListener("change", () => {
         calculateCost();
-    }
-    if(currentCost === 0){
-        return;
-    }
-    let targetPrice =
-        currentCost / (1 - gp/100);
-    currentResult =
-        targetPrice.toFixed(4);
-    document.getElementById("resultPrice").innerText =
-        "$" + currentResult;
-    document.getElementById("resultGP").innerText =
-        "Target GP: " + gp + "%";
-}
-function calculateCustom(){
-    let gp =
-        parseFloat(
-            document.getElementById("customGP").value
-        );
-    if(isNaN(gp)){
-        alert("Enter a GP percentage.");
-        return;
-    }
-    calculateTarget(gp);
-}
-function copyResult(){
-    if(currentResult === ""){
-        return;
-    }
-    navigator.clipboard.writeText(currentResult);
-    alert("Copied: " + currentResult);
-}
-function resetApp(){
-    document.getElementById("sapPrice").value = "";
-    document.getElementById("customGP").value = "";
-    currentCost = 0;
-    currentResult = "";
-    document.getElementById("costDisplay").innerText =
-        "$0.0000";
-    document.getElementById("resultPrice").innerText =
-        "$0.0000";
-    document.getElementById("resultGP").innerText =
-        "Select a GP %";
-}
-</script>
+        if (currentGP !== null) setSalePrice(currentGP);
+        updateCompetitor();
+      });
+    });
+
+    competitorPrice.addEventListener("input", updateCompetitor);
+
+    document.getElementById("clearButton").addEventListener("click", () => {
+      sapPrice.value = "";
+      customGP.value = "";
+      competitorPrice.value = "";
+      currentCost = 0;
+      currentSalePrice = 0;
+      currentGP = null;
+      costDisplay.textContent = "$0.0000";
+      selectedGP.textContent = "--%";
+      salePrice.textContent = "$0.0000";
+      saleSub.textContent = "Ingresa precio SAP y elige margen";
+      compMargin.textContent = "0.00%";
+      compProfit.textContent = "$0.0000";
+      compDiff.textContent = "$0.0000";
+      compStatus.textContent = "Ingresa precio del competidor";
+      clearActiveButtons();
+      sapPrice.focus();
+    });
+  </script>
 </body>
 </html>
